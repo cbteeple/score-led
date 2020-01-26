@@ -1,0 +1,12 @@
+/dist
+/build
+/.eggs
+/*.egg
+/*.egg-info
+*.pyc
+/venv
+*.log
+/.ipynb_checkpoints
+*.ipynb
+*.swp
+/cached_json

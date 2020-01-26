@@ -1,0 +1,125 @@
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 255 (100.00 % dc)
+Pin 1 is set to: 255 (100.00 % dc)
+Pin 2 is set to: 255 (100.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 191 (74.00 % dc)
+Pin 2 is set to: 156 (61.00 % dc)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 29 (11.00 % dc)
+Pin 1 is set to: 145 (56.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 95 (37.00 % dc)
+Pin 1 is set to: 122 (47.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 3 (1.00 % dc)
+Pin 2 is set to: 219 (85.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 99 (38.00 % dc)
+Pin 1 is set to: 79 (30.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 191 (74.00 % dc)
+Pin 2 is set to: 156 (61.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 255 (100.00 % dc)
+Pin 1 is set to: 246 (96.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 95 (37.00 % dc)
+Pin 1 is set to: 122 (47.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 170 (66.00 % dc)
+Pin 2 is set to: 56 (21.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 255 (100.00 % dc)
+Pin 1 is set to: 255 (100.00 % dc)
+Pin 2 is set to: 255 (100.00 % dc)
+Pin 0 is set to: 95 (37.00 % dc)
+Pin 1 is set to: 122 (47.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+python: can't open file 'tempMonitor.py': [Errno 2] No such file or directory
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 71 (27.00 % dc)
+Pin 1 is set to: 34 (13.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+Pin 0 is set to: 255 (100.00 % dc)
+Pin 1 is set to: 255 (100.00 % dc)
+Pin 2 is set to: 255 (100.00 % dc)
+Pin 0 is set to: 229 (89.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 214 (83.00 % dc)
+/home/pi/Documents/SuperBowl/led_driver.py:11: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+  GPIO.setup(pin, GPIO.OUT)
+/home/pi/Documents/SuperBowl/led_driver.py:23: RuntimeWarning: No channels have been set up yet - nothing to clean up!  Try cleaning up at the end of your program instead!
+  GPIO.cleanup()
+ 
+Pin 0 is set to: 127 (49.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 24 (9.00 % dc)
+Pin 2 is set to: 117 (45.00 % dc)
+Pin 0 is set to: 0 (0.00 % dc)
+Pin 1 is set to: 0 (0.00 % dc)
+Pin 2 is set to: 0 (0.00 % dc)
+NE: 86.4864864865
+LA: 86.6666666667
+scores were null
+[217.0, 37.0, 0]
+[212.0, 42.0, 0]

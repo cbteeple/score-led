@@ -1,0 +1,46 @@
+import twitter_sentiment
+from collections import deque
+
+# Collect the tweets!
+
+# How many past twitter api calls to save
+save_num_calls = 4
+
+team1 = 'NE'
+team2 = 'PHI'
+
+# Keep an array of the # of tweets sentiment
+# [ positive, negative, neutral ]
+tweet_sentiment = {
+    'NE':}
+
+# creating object of TwitterClient Class
+api = TwitterClient()
+
+def new_analysis(tag):
+    # calling function to get tweets
+    tweets = api.get_tweets(query = tag, count = 200)
+ 
+    # picking positive tweets from tweets
+    pos_tweets = len([tweet for tweet in tweets if tweet['sentiment'] == 'positive'])
+    # Number of  negative tweets from tweets
+    neg_tweets = len([tweet for tweet in tweets if tweet['sentiment'] == 'negative'])
+    # Number of neutral tweets
+    neut_tweets = len(tweets) - pos_tweets - neg_tweets 
+
+    return pos_tweets, neg_tweets, neut_tweets
+
+def main():
+    tweet_sentiment(new_analysis('@Patriots')
+
+    tweet_sentiment.append([pos_tweets, neg_tweets, neut_tweets])
+
+    if len(tweet_sentiment) > save_num_calls:
+        tweet_sentiment.popleft()
+
+    # Get the percentage of positive/negative/neutral tweets in the list
+    pos = [t[0] for t in tweet_sentiment]
+    neg = [t[1] for t in tweet_sentiment]
+    neut = [t[2] for t in tweet_sentiment]
+    
+    return 100 * float(pos) / (pos + neg)
