@@ -1,0 +1,22 @@
+team1:
+  abbr: AFC  #KC
+  twitter: "#chiefs"
+  colors:
+    bright: "#ce0000"
+    main:   "#7f0000"
+    dim:    "#330000"
+
+team2:
+  abbr: NFC  #SF
+  twitter: "#49ers"
+  colors:
+    bright: "#d98d00"
+    main:   "#825400"
+    dim:    "#3b2600"
+
+
+animations:
+  fadeTime: 0.25
+  pulseTime: 3.5
+  pulseFlag: false
+  singlePulse: false

@@ -22,24 +22,28 @@ skipIntro=1
 
 
 
+with open('settings.yaml') as f:
+	settings = yaml.safe_load(f)
+
+
 #Start with a color (will change this eventually to start with #000000)
 
-#Pats - RED
-team1_bright = "#ce0000"
-team1_color  = "#7f0000"
-team1_dim    = "#330000"
+#KC - RED
+team1_bright = settings['team1']['colors']['bright']
+team1_color  = settings['team1']['colors']['main']
+team1_dim    = settings['team1']['colors']['dim']
 
-#Rams - BLUE
-team2_bright = "#0031e8"
-team2_color  = "#001875"
-team2_dim    = "#000b35"
+#SF - Yellow
+team2_bright = settings['team2']['colors']['bright']
+team2_color  = settings['team2']['colors']['main']
+team2_dim    = settings['team2']['colors']['dim']
 
 color_vec=[hex2rgb(team1_color), hex2rgb("#000000"), hex2rgb(team2_color), hex2rgb("#000000")]
 
-fadeTime_default = 0.25
-pulseTime = 3.5
-pulseFlag=0
-singlePulse=0;
+fadeTime_default = settings['animations']['fadeTime']
+pulseTime = settings['animations']['pulseTime']
+pulseFlag= settings['animations']['pulseFlag']
+singlePulse= settings['animations']['singlePulse']
 
 team1_pulse=[team1_bright, team1_dim]
 team2_pulse=[team2_bright, team2_dim]
@@ -59,12 +63,12 @@ save_num_calls = 4
 num_tweets = 400
 call_rate = 15  # seconds
 
-team1 = 'NE'
-team2 = 'LA'
+team1 = settings['team1']['abbr']
+team2 = settings['team2']['abbr']
 
 tags = {
-    team1: '#Patriots',
-    team2: '#larams'
+    team1: settings['team1']['twitter'],
+    team2: settings['team2']['twitter']
 }
 
 # Keep an array of the # of tweets sentiment
