@@ -16,7 +16,7 @@ ScoreLED Technology
 1. Connect all four sets of three-pin LED plugs to the GPIO header on the pi
 
 ### Software Setup
-1. Set up the colors for each team using hex codes in "_main_multithreading2019.py_"
+1. Set up the team names, twitter handles, and LED colors for each team using hex codes in "_settings.yaml_"
 2. Set the default thresholds for sentiment colors in "_thresholds.yaml_"
 
 ### Run
