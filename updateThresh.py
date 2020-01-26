@@ -2,7 +2,9 @@ import sys
 import yaml
 
 
-def update(t1, t2):
+def update(t1=None, t2=None):
+
+
 	thresholds = {
 		"thresh_neg": int(t1),
 		"thresh_pos" : int(t2)
