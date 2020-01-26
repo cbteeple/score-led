@@ -9,7 +9,7 @@ ScoreLED Technology
 ### Software
 - [tweepy](https://www.tweepy.org/), a python wrapper for the twiter api: `pip install tweepy`
 - [textblob](https://textblob.readthedocs.io/en/dev/), a text handing api: `pip install textblob`
-- [yaml](https://yaml.org/), yet another markup language: `pip install yaml`
+- [yaml](https://yaml.org/), yet another markup language: `pip install pyyaml`
 
 ## Usage:
 ### Hardware Setup
