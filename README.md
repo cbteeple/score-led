@@ -1,6 +1,8 @@
 # score-led
 ScoreLED Technology
 
+![Score-LED](https://raw.githubusercontent.com/cbteeple/score-led/master/docs/scoreled.jpg)
+
 ## Dependencies:
 ### Hardware
 1. [ScoreLED bases + light panels](https://clarkteeple.weebly.com/lightboxes)
