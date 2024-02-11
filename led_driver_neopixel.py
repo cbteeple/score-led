@@ -24,8 +24,9 @@ class PixelHandler:
 	}
 
 	# Pixel setup
-	def __init__(self, pin_configs, order='GRB'):
+	def __init__(self, pin_configs, order='GRB', debug=False):
 		self.pin_configs = pin_configs
+		self.debug = debug
 		pixel_groups={}
 		for config in pin_configs:
 			num_pixels = config['num_pixels']
@@ -40,7 +41,7 @@ class PixelHandler:
 			pixels = neopixel.NeoPixel(
 				self.PIN_MAP[pin],
 				num_pixels,
-				brightness=0.2,
+				brightness=1.0,
 				auto_write=False,
 				pixel_order=self.ORDER_MAP[order],
 			)
@@ -55,16 +56,17 @@ class PixelHandler:
 		pixels.show()
 
 	def show_all(self):
-		for pixels in self.pixel_groups:
+		for key, pixels in self.pixel_groups.items():
 			pixels.show()
 	
 	def set_color(self, group_idx, color, show=True):
-		print("Setting group %d to: %d, %d, %d"%(
-			group_idx,
-			color[0],
-			color[1],
-			color[2],
-		))
+		if self.debug:
+			print("Setting group %d to: %d, %d, %d"%(
+				group_idx,
+				color[0],
+				color[1],
+				color[2],
+			))
 
 		group_config = self.pin_configs[group_idx]
 		pixels = self.pixel_groups[group_config['pin']]
@@ -77,10 +79,11 @@ class PixelHandler:
 			self.show_group(group_idx)
 		
 	def set_all_colors(self, color_vec, show=True):
-		print("Setting all groups at once.")
+		if self.debug:
+			print("Setting all groups at once.")
 
 		for i, color in enumerate(color_vec):
-			self.setColor(i, color, show=False)
+			self.set_color(i, color, show=False)
 		
 		if show:
 			self.show_all()
@@ -105,7 +108,7 @@ class PixelHandler:
 			color_vec=[]
 			for ramp in ramps:
 				color_vec.append(ramp[step])
-			self.set_all_colors(self, color_vec, show=True)
+			self.set_all_colors(color_vec, show=True)
 			time.sleep(timestep)
 
 	
@@ -116,7 +119,7 @@ def get_ramp(
 		num_steps,
 	):
 	
-	fadeList = [[0.0 for x in range(num_steps+1)] for y in range(len(new_color_all))]
+	fadeList = [[0.0 for y in range(len(new_color_all))] for x in range(num_steps+1)]
 	
 	#For each color pin
 	for pinIdx, _ in enumerate(new_color_all):
@@ -124,19 +127,19 @@ def get_ramp(
 		color_inc = (float(new_color_all[pinIdx]) - float(cur_color_all[pinIdx]))/float(num_steps)
 		
 		#For each timestep, store the value of the duty cycle
-		fadeList[pinIdx][0]= float(cur_color_all[pinIdx])
+		fadeList[0][pinIdx]= int(cur_color_all[pinIdx])
 		for stepIdx in range(1,num_steps+1):
-			fadeList[pinIdx][stepIdx] = fadeList[pinIdx][stepIdx-1]+color_inc
+			fadeList[stepIdx][pinIdx] = int(fadeList[stepIdx-1][pinIdx]+color_inc)
 			
 			#Make sure the duty cycle values are between 0 and 100
-			if fadeList[pinIdx][stepIdx]>100:
-				fadeList[pinIdx][stepIdx]=100
+			if fadeList[stepIdx][pinIdx]>100:
+				fadeList[stepIdx][pinIdx]=int(100)
 				
-			if fadeList[pinIdx][stepIdx]<0:
-				fadeList[pinIdx][stepIdx]=0
+			if fadeList[stepIdx][pinIdx]<0:
+				fadeList[stepIdx][pinIdx]=int(0)
 				
 	for pinIdx in range(len(new_color_all)):
-		fadeList[pinIdx][num_steps]=float(new_color_all[pinIdx])
+		fadeList[num_steps][pinIdx]=int(new_color_all[pinIdx])
 				
 	return fadeList
 	
@@ -164,7 +167,7 @@ def setColors(pins):
 def runPulse(pwm):
 	for dc in range(0, 101, 5):
 		for p in pwm:
-			print p
+			print(p)
 			p.ChangeDutyCycle(dc)
 		time.sleep(0.03)
 	for dc in range(100, -1, -5):

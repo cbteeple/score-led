@@ -2,7 +2,6 @@
 import threading
 from hex2rgb import hex2rgb, rgb2hex
 import nfl_scores
-from twitter_sentiment import TwitterClient
 from collections import deque
 import time
 import random
@@ -19,6 +18,7 @@ pin_config = [
 ]
 
 skipIntro=1
+call_rate = 15  # seconds
 
 #Start with a color (will change this eventually to start with #000000)
 
@@ -43,36 +43,8 @@ team1_pulse=[team1_bright, team1_dim]
 team2_pulse=[team2_bright, team2_dim]
 
 
-
-
-
-
-
-# Collect the tweets!
-
-# How many past twitter api calls to save
-save_num_calls = 4
-num_tweets = 400
-call_rate = 15  # seconds
-
-team1 = 'NE'
-team2 = 'PHI'
-
-tags = {
-    team1: '#Patriots',
-    team2: '#Eagles'
-}
-
-# Keep an array of the # of tweets sentiment
-# [ positive, negative, neutral ]
-tweet_sentiment = {
-    team1: deque([]),
-    team2: deque([])
-}
-
-# creating object of TwitterClient Class
-api = TwitterClient()
-
+team1 = 'KC'
+team2 = 'SF'
 
 
 def new_analysis(tag):
@@ -99,7 +71,7 @@ def new_analysis(tag):
 #Define the function that will become our led loom process
 def ledLoop(led_handler, goFlag, updateFlag):
 	#Setup all the groups of LED pins and begin PWM on them
-	led_handler.setAllColors(color_vec)
+	led_handler.set_all_colors(color_vec)
 	
 	curr_colors=color_vec[:][:]
 	#Big loop - this is where colors actually get set
@@ -135,6 +107,7 @@ def ledLoop(led_handler, goFlag, updateFlag):
 #Run Stuff
 if __name__ == '__main__':
 	#Start a new process that pulses the intensity of the LEDs
+	print("Starting...")
 	led_handler = led.PixelHandler(pin_config)
 	
 	goFlag=threading.Event()
@@ -183,43 +156,7 @@ if __name__ == '__main__':
 	
 	
 	try:
-		positivity = {}
 		while 1:	
-			#Check at regular intervals for the twitter sentiment
-			for team, vals in tweet_sentiment.iteritems():
-				new_tweets = new_analysis(tags[team])
-				tweet_sentiment[team].append(new_tweets)
-
-				if len(tweet_sentiment[team]) > save_num_calls:
-					tweet_sentiment[team].popleft()
-
-				# Get the percentage of positive/negative/neutral tweets in the list
-				t_s = tweet_sentiment[team]
-				pos = sum([t[0] for t in t_s])
-				neg = sum([t[1] for t in t_s])
-				neut = sum([t[2] for t in t_s])
-
-				positivity[team] =  100 * float(pos) / (pos + neg)
-				
-				#positivity[team]=random.randint(0,100)
-				print team + ': ' + str(positivity[team])
-			
-			
-			#find the R and G values (B is always 0)
-			
-			R=25.5*math.sqrt(-positivity[team1]+100)
-			G=255./10000*(positivity[team1]**2)
-			B=0
-			
-			color_vec[1]= [R,G,B]
-			
-			R=25.5*math.sqrt(-positivity[team2]+100)
-			G=255./10000*(positivity[team2]**2)
-			B=0
-			color_vec[3]= [R,G,B]
-			
-			
-			
 			#Check at regular intervals for the score
 			try:
 				game_data = nfl_scores.get_scores()
@@ -229,20 +166,21 @@ if __name__ == '__main__':
 				team1_score=nfl_scores.get_score(team1_data)
 				team2_score=nfl_scores.get_score(team2_data)
 				
-				team1_posession = nfl_scores.has_possession(game_data,team1)
-				team2_posession = nfl_scores.has_possession(game_data,team2)
+				# team1_posession = nfl_scores.has_possession(game_data,team1)
+				# team2_posession = nfl_scores.has_possession(game_data,team2)
 				
 				qtr=nfl_scores.get_qtr(game_data)
 			
 				#Score to RGB
 				#print team1_score, team2_score
 				#print
-				if qtr == "Pregame":
+				if 'pre' in qtr:
 					team1_pulse=[team1_bright, team1_dim]
 					team2_pulse=[team2_bright, team2_dim]
 					pulseFlag=1;
 					singlePulse=0
 					pulseTime=3.5
+					print("The game will begin soon...")
 					
 					
 				else:
@@ -297,7 +235,8 @@ if __name__ == '__main__':
 					'''
 					
 			except TypeError:
-				pass					
+				print("Something went wrong...")
+				raise					
 
 				
 			if pulseFlag:
