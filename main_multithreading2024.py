@@ -17,20 +17,23 @@ pin_config = [
 	{'pin': 21, 'num_pixels': 22, 'start_idx': 9},
 ]
 
-skipIntro=0
+skipIntro=1
 call_rate = 15  # seconds
 
 #Start with a color (will change this eventually to start with #000000)
 
-#Eagles
-team2_bright = "#00cc2a"
-team2_color  = "#005b12"
-team2_dim    = "#002808"
+#SF
+team2_bright = "#ff6a4f"
+team2_color  = "#cc1f00"
+team2_dim    = "#8a1500"
 
-#Patriots
-team1_bright = "#0031e8"
-team1_color  = "#001875"
-team1_dim    = "#000b35"
+#KC
+team1_bright = "#ff5959"
+team1_color  = "#cc0000"
+team1_dim    = "#910000"
+
+team1_colors=["#cc0000","#d6d6d6"]
+team2_colors=["#cc0000","#ff6a00"]
 
 color_vec=[hex2rgb(team1_color), hex2rgb("#000000"), hex2rgb(team2_color), hex2rgb("#000000")]
 
@@ -179,8 +182,8 @@ if __name__ == '__main__':
 			#print team1_score, team2_score
 			#print
 			if 'pre' in qtr:
-				team1_pulse=[team1_bright, team1_dim]
-				team2_pulse=[team2_bright, team2_dim]
+				team1_pulse=[team1_colors[0], team1_colors[1]]
+				team2_pulse=[team2_colors[0], team2_colors[1]]
 				pulseFlag=1;
 				singlePulse=0
 				pulseTime=3.5
@@ -251,13 +254,17 @@ if __name__ == '__main__':
 				
 				for idx in range(numPulses):
 					color_vec[0]=hex2rgb(team1_pulse[0])
+					color_vec[1]=hex2rgb(team1_pulse[1])
 					color_vec[2]=hex2rgb(team2_pulse[0])
+					color_vec[3]=hex2rgb(team2_pulse[1])
 					updateFlag.set()
 					time.sleep(pulseTime+0.25)
 					
 					
 					color_vec[0]=hex2rgb(team1_pulse[1])
+					color_vec[1]=hex2rgb(team1_pulse[0])
 					color_vec[2]=hex2rgb(team2_pulse[1])
+					color_vec[3]=hex2rgb(team2_pulse[0])
 					updateFlag.set()
 					time.sleep(pulseTime+0.25)
 					
