@@ -120,7 +120,8 @@ class PixelHandler:
 		
 		#Precompute all color ramps
 		for new_color, curr_color in zip(new_color_vec, cur_color_vec):
-			print("{} --> {}".format(curr_color, new_color))
+			if self.debug:
+				print("{} --> {}".format(curr_color, new_color))
 			fade_list = get_ramp(new_color, curr_color, num_steps)
 			ramps.append(fade_list)
 

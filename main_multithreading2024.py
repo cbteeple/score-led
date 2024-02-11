@@ -77,10 +77,7 @@ def ledLoop(led_handler, goFlag, updateFlag):
 			trans_time=fadeTime_default
 				
 		if updateFlag.isSet():
-			print("Updating Colors")
-			print(color_vec)
 			led_handler.set_all_colors_fade(color_vec, curr_colors, trans_time)
-			print("Colors Updated")
 			curr_colors=color_vec[:][:]
 			updateFlag.clear()
 		time.sleep(0.1)
