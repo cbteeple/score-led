@@ -166,7 +166,6 @@ if __name__ == '__main__':
 			# team2_posession = nfl_scores.has_possession(game_data,team2)
 			
 			qtr=nfl_scores.get_qtr(game_data)
-			print(qtr)
 		
 			#Score to RGB
 			#print team1_score, team2_score
@@ -204,8 +203,7 @@ if __name__ == '__main__':
 
 
 				if team1_score != 0 or team2_score != 0:
-					print(team1_score)
-					print(team2_score)
+					print(team1_score, team2_score)
 					indicator_offset = 2
 					num_pixels_indicator = pin_config[1]['num_pixels']-2*indicator_offset
 
@@ -246,12 +244,8 @@ if __name__ == '__main__':
 					else:
 						ratio = team2_score/team1_score
 
-					print(ratio)
-
 					idx_1 = int(num_pixels_indicator*ratio) + indicator_offset
 					idx_3 = int(num_pixels_indicator*(1-ratio)) + indicator_offset
-
-					print(idx_1, idx_3)
 
 					# Score Indicator
 					color_array_1 = np.zeros((pin_config[1]['num_pixels'],3))
@@ -313,7 +307,7 @@ if __name__ == '__main__':
 					
 					
 			else:		
-				print("Setting primary groups off")		
+				print("Not changing LEDs")		
 				# color_temp=color_vec[:]
 				
 				# color_vec[1]=hex2rgb("7C7C7C")
