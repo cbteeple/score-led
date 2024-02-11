@@ -93,7 +93,7 @@ class PixelHandler:
 			new_color_vec,
 			cur_color_vec,
 			time_tot,
-			timestep=0.025,
+			timestep=0.01,
 		):
 		ramps= []
 		num_steps=int(time_tot/timestep)

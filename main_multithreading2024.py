@@ -13,8 +13,8 @@ import led_driver_neopixel as led
 pin_config = [
     {'pin': 10, 'num_pixels': 9, 'start_idx': 0},
 	{'pin': 10, 'num_pixels': 22, 'start_idx': 9},
-	{'pin': 18, 'num_pixels': 9, 'start_idx': 0},
-	{'pin': 18, 'num_pixels': 22, 'start_idx': 9},
+	{'pin': 21, 'num_pixels': 9, 'start_idx': 0},
+	{'pin': 21, 'num_pixels': 22, 'start_idx': 9},
 ]
 
 skipIntro=0
@@ -108,7 +108,7 @@ def ledLoop(led_handler, goFlag, updateFlag):
 if __name__ == '__main__':
 	#Start a new process that pulses the intensity of the LEDs
 	print("Starting...")
-	led_handler = led.PixelHandler(pin_config)
+	led_handler = led.PixelHandler(pin_config, debug=True)
 	
 	goFlag=threading.Event()
 	updateFlag = threading.Event()
@@ -160,85 +160,84 @@ if __name__ == '__main__':
 			#Check at regular intervals for the score
 			try:
 				game_data = nfl_scores.get_scores()
-				team1_data = nfl_scores.get_team_data(game_data, team1)
-				team2_data = nfl_scores.get_team_data(game_data, team2)
+			except TypeError:
+				print("Error getting scores...")
+				continue
 			
-				team1_score=nfl_scores.get_score(team1_data)
-				team2_score=nfl_scores.get_score(team2_data)
-				
-				# team1_posession = nfl_scores.has_possession(game_data,team1)
-				# team2_posession = nfl_scores.has_possession(game_data,team2)
-				
-				qtr=nfl_scores.get_qtr(game_data)
+			team1_data = nfl_scores.get_team_data(game_data, team1)
+			team2_data = nfl_scores.get_team_data(game_data, team2)
+		
+			team1_score=nfl_scores.get_score(team1_data)
+			team2_score=nfl_scores.get_score(team2_data)
 			
-				#Score to RGB
-				#print team1_score, team2_score
-				#print
-				if 'pre' in qtr:
-					team1_pulse=[team1_bright, team1_dim]
-					team2_pulse=[team2_bright, team2_dim]
+			# team1_posession = nfl_scores.has_possession(game_data,team1)
+			# team2_posession = nfl_scores.has_possession(game_data,team2)
+			
+			qtr=nfl_scores.get_qtr(game_data)
+		
+			#Score to RGB
+			#print team1_score, team2_score
+			#print
+			if 'pre' in qtr:
+				team1_pulse=[team1_bright, team1_dim]
+				team2_pulse=[team2_bright, team2_dim]
+				pulseFlag=1;
+				singlePulse=0
+				pulseTime=3.5
+				print("The game will begin soon...")
+				
+				
+			else:
+				if team1_score is not None and team2_score is not None:
+					print(team1_score)
+					print(team2_score)
+					if team1_score > team2_score:
+						color_vec[0]=hex2rgb(team1_bright)
+						color_vec[2]=hex2rgb(team2_dim)
+					elif team1_score < team2_score:
+						color_vec[0]=hex2rgb(team1_dim)
+						color_vec[2]=hex2rgb(team2_bright)
+					else:
+						color_vec[0]=hex2rgb(team1_color)
+						color_vec[2]=hex2rgb(team2_color)
+				
+					pulseFlag=0
+										
+				else:
 					pulseFlag=1;
 					singlePulse=0
 					pulseTime=3.5
-					print("The game will begin soon...")
-					
-					
-				else:
-					if team1_score is not None and team2_score is not None:
-						print(team1_score)
-						print(team2_score)
-						if team1_score > team2_score:
-							color_vec[0]=hex2rgb(team1_bright)
-							color_vec[2]=hex2rgb(team2_dim)
-						elif team1_score < team2_score:
-							color_vec[0]=hex2rgb(team1_dim)
-							color_vec[2]=hex2rgb(team2_bright)
-						else:
-							color_vec[0]=hex2rgb(team1_color)
-							color_vec[2]=hex2rgb(team2_color)
-					
-						pulseFlag=0
-											
-					else:
-						pulseFlag=1;
-						singlePulse=0
-						pulseTime=3.5
-						print('scores were null')
-					
-
-					print(color_vec[0])
-					print(color_vec[2])
-					'''if team1_posession:
-						print('team1 has posession')
-						pulseFlag=1
-						singlePulse=1
-						pulseTime=1.0
-						rgb=[0, 0, 0]
-						for idx in range(len(rgb)):
-							rgb[idx]= int(color_vec[0][idx] + color_vec[0][idx]*0.5)
-											
-						team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(rgb)]
-						team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(color_vec[2])]
-					
-					
-					elif team2_posession:
-						print('team2 has posession')
-						pulseFlag=1
-						singlePulse=1
-						pulseTime=1.0
-						rgb=[0, 0, 0]
-						for idx in range(len(rgb)):
-							rgb[idx]= int(color_vec[2][idx] + color_vec[2][idx]*0.5)
-											
-						team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(color_vec[0])]
-						team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(rgb)]
-					'''
-					
-			except TypeError:
-				print("Something went wrong...")
-				raise					
-
+					print('scores were null')
 				
+
+				print(color_vec[0])
+				print(color_vec[2])
+				'''if team1_posession:
+					print('team1 has posession')
+					pulseFlag=1
+					singlePulse=1
+					pulseTime=1.0
+					rgb=[0, 0, 0]
+					for idx in range(len(rgb)):
+						rgb[idx]= int(color_vec[0][idx] + color_vec[0][idx]*0.5)
+										
+					team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(rgb)]
+					team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(color_vec[2])]
+				
+				
+				elif team2_posession:
+					print('team2 has posession')
+					pulseFlag=1
+					singlePulse=1
+					pulseTime=1.0
+					rgb=[0, 0, 0]
+					for idx in range(len(rgb)):
+						rgb[idx]= int(color_vec[2][idx] + color_vec[2][idx]*0.5)
+										
+					team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(color_vec[0])]
+					team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(rgb)]
+				'''
+								
 			if pulseFlag:
 				#Set color for 4 sec, 4 times
 				
