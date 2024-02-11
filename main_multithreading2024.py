@@ -11,13 +11,13 @@ import led_driver_neopixel as led
 	
 #Define some low-level pin variables
 pin_config = [
-    {'pin': 10, 'num_pixels': 15, 'start_idx': 0},
-	{'pin': 10, 'num_pixels': 22, 'start_idx': 15},
-	{'pin': 12, 'num_pixels': 15, 'start_idx': 0},
-	{'pin': 12, 'num_pixels': 22, 'start_idx': 15},
+    {'pin': 10, 'num_pixels': 9, 'start_idx': 0},
+	{'pin': 10, 'num_pixels': 22, 'start_idx': 9},
+	{'pin': 18, 'num_pixels': 9, 'start_idx': 0},
+	{'pin': 18, 'num_pixels': 22, 'start_idx': 9},
 ]
 
-skipIntro=1
+skipIntro=0
 call_rate = 15  # seconds
 
 #Start with a color (will change this eventually to start with #000000)
