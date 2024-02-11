@@ -34,7 +34,7 @@ def get_team_data(game_data, team):
         
 
 def get_score(team_data):
-    return team_data['score']
+    return int(team_data['score'])
     
 def possession(game_data):
     return game_data['posteam']

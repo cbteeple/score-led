@@ -1,4 +1,5 @@
 #Get functions from external sources
+import copy
 import threading
 from hex2rgb import hex2rgb, rgb2hex
 import nfl_scores
@@ -6,15 +7,16 @@ from collections import deque
 import time
 import random
 import math
+import numpy as np
 
 import led_driver_neopixel as led
 	
 #Define some low-level pin variables
 pin_config = [
     {'pin': 10, 'num_pixels': 9, 'start_idx': 0},
-	{'pin': 10, 'num_pixels': 22, 'start_idx': 9},
+	{'pin': 10, 'num_pixels': 15, 'start_idx': 9},
 	{'pin': 21, 'num_pixels': 9, 'start_idx': 0},
-	{'pin': 21, 'num_pixels': 22, 'start_idx': 9},
+	{'pin': 21, 'num_pixels': 15, 'start_idx': 9},
 ]
 
 skipIntro=1
@@ -32,13 +34,15 @@ team1_bright = "#ff5959"
 team1_color  = "#cc0000"
 team1_dim    = "#910000"
 
-team1_colors=["#cc0000","#d6d6d6"]
-team2_colors=["#cc0000","#ff6a00"]
+team1_colors=["#ff0000","#858585"]
+team2_colors=["#ff0000","#ff6a00"]
+score_indicator_color="#0d6600"
 
 color_vec=[hex2rgb(team1_color), hex2rgb("#000000"), hex2rgb(team2_color), hex2rgb("#000000")]
+curr_colors=color_vec[:][:]
 
 fadeTime_default = 0.25
-pulseTime = 3.5
+pulseTime = 5.0
 pulseFlag=0
 singlePulse=0;
 
@@ -49,25 +53,8 @@ team2_pulse=[team2_bright, team2_dim]
 team1 = 'KC'
 team2 = 'SF'
 
-
-def new_analysis(tag):
-    # calling function to get tweets
-    tweets = api.get_tweets(query = tag, count = num_tweets) 
-    # Number of positive tweets from tweets
-    pos_tweets = len([tweet for tweet in tweets if tweet['sentiment'] == 'positive'])
-    # Number of negative tweets from tweets
-    neg_tweets = len([tweet for tweet in tweets if tweet['sentiment'] == 'negative'])
-    # Number of neutral tweets
-    neut_tweets = len(tweets) - pos_tweets - neg_tweets 
-
-    return pos_tweets, neg_tweets, neut_tweets
-
-
-
-
-
-
-
+team1_score_last = 0
+team2_score_last = 0
 
 
 
@@ -88,10 +75,12 @@ def ledLoop(led_handler, goFlag, updateFlag):
 			trans_time=pulseTime
 		else:
 			trans_time=fadeTime_default
-			
-		
+				
 		if updateFlag.isSet():
+			print("Updating Colors")
+			print(color_vec)
 			led_handler.set_all_colors_fade(color_vec, curr_colors, trans_time)
+			print("Colors Updated")
 			curr_colors=color_vec[:][:]
 			updateFlag.clear()
 		time.sleep(0.1)
@@ -111,7 +100,7 @@ def ledLoop(led_handler, goFlag, updateFlag):
 if __name__ == '__main__':
 	#Start a new process that pulses the intensity of the LEDs
 	print("Starting...")
-	led_handler = led.PixelHandler(pin_config, debug=True)
+	led_handler = led.PixelHandler(pin_config)
 	
 	goFlag=threading.Event()
 	updateFlag = threading.Event()
@@ -163,7 +152,7 @@ if __name__ == '__main__':
 			#Check at regular intervals for the score
 			try:
 				game_data = nfl_scores.get_scores()
-			except TypeError:
+			except:
 				print("Error getting scores...")
 				continue
 			
@@ -177,11 +166,12 @@ if __name__ == '__main__':
 			# team2_posession = nfl_scores.has_possession(game_data,team2)
 			
 			qtr=nfl_scores.get_qtr(game_data)
+			print(qtr)
 		
 			#Score to RGB
 			#print team1_score, team2_score
 			#print
-			if 'pre' in qtr:
+			if ('pre' in qtr):
 				team1_pulse=[team1_colors[0], team1_colors[1]]
 				team2_pulse=[team2_colors[0], team2_colors[1]]
 				pulseFlag=1;
@@ -191,74 +181,123 @@ if __name__ == '__main__':
 				
 				
 			else:
-				if team1_score is not None and team2_score is not None:
+				# Team Logos
+				idx_0 = int(pin_config[0]['num_pixels']*(0.6))
+				idx_2 = int(pin_config[2]['num_pixels']*(0.6))
+				
+				color_array_0 = np.zeros((pin_config[0]['num_pixels'],3))
+				color_array_0[:,:] = hex2rgb(team1_colors[1])
+				color_array_0[0:idx_0, :] = hex2rgb(team1_colors[0])
+				color_array_2 = np.zeros((pin_config[2]['num_pixels'],3))
+				color_array_2[:,:] = hex2rgb(team2_colors[1])
+				color_array_2[0:idx_2, :] = hex2rgb(team2_colors[0])
+
+				for idx in range(len(color_array_0)):
+					color_array_0_tmp = np.roll(color_array_0, idx, axis=0).tolist()
+					color_array_2_tmp = np.roll(color_array_2, idx, axis=0).tolist()
+					led_handler.set_color_array(0, color_array_0_tmp, invert=False)
+					led_handler.set_color_array(2, color_array_2_tmp, invert=False)
+					time.sleep(0.05)
+				
+				led_handler.set_color_array(0, color_array_0, invert=False)
+				led_handler.set_color_array(2, color_array_2, invert=False)
+
+
+				if team1_score != 0 or team2_score != 0:
 					print(team1_score)
 					print(team2_score)
-					if team1_score > team2_score:
-						color_vec[0]=hex2rgb(team1_bright)
-						color_vec[2]=hex2rgb(team2_dim)
-					elif team1_score < team2_score:
-						color_vec[0]=hex2rgb(team1_dim)
-						color_vec[2]=hex2rgb(team2_bright)
+					indicator_offset = 2
+					num_pixels_indicator = pin_config[1]['num_pixels']-2*indicator_offset
+
+					# If the score changed, animate!
+					if team1_score != team1_score_last:
+						idx_1 = int(pin_config[1]['num_pixels']*(0.5))
+						
+						color_array_1 = np.zeros((pin_config[1]['num_pixels'],3))
+						color_array_1[:,:] = hex2rgb(team1_colors[1])
+						color_array_1[0:idx_1, :] = hex2rgb(team1_colors[0])
+
+						for i in range(abs(team1_score-team1_score_last)):
+							for idx in range(len(color_array_1)):
+								color_array_1_tmp = np.roll(color_array_1, idx, axis=0).tolist()
+								led_handler.set_color_array(1, color_array_1_tmp, invert=True)
+								time.sleep(0.04)
+
+					if team2_score != team2_score_last:
+						idx_3 = int(pin_config[3]['num_pixels']*(0.5))
+						
+						color_array_3 = np.zeros((pin_config[3]['num_pixels'],3))
+						color_array_3[:,:] = hex2rgb(team2_colors[1])
+						color_array_3[0:idx_3, :] = hex2rgb(team2_colors[0])
+
+						for i in range(abs(team2_score-team2_score_last)):
+							for idx in range(len(color_array_3)):
+								color_array_3_tmp = np.roll(color_array_3, idx, axis=0).tolist()
+								led_handler.set_color_array(3, color_array_3_tmp, invert=True)
+								time.sleep(0.04)
+
+					# Display the idicator
+					if team1_score == 0 and team2_score == 0:
+						ratio = 0.5
+					elif team1_score == 0:
+						ratio = 0.2
+					elif team2_score == 0:
+						ratio = 0.8
 					else:
-						color_vec[0]=hex2rgb(team1_color)
-						color_vec[2]=hex2rgb(team2_color)
+						ratio = team2_score/team1_score
+
+					print(ratio)
+
+					idx_1 = int(num_pixels_indicator*ratio) + indicator_offset
+					idx_3 = int(num_pixels_indicator*(1-ratio)) + indicator_offset
+
+					print(idx_1, idx_3)
+
+					# Score Indicator
+					color_array_1 = np.zeros((pin_config[1]['num_pixels'],3))
+					color_array_1[indicator_offset:idx_1, :] = hex2rgb(score_indicator_color)
+
+					color_array_3 = np.zeros((pin_config[3]['num_pixels'],3))
+					color_array_3[indicator_offset:idx_3, :] = hex2rgb(score_indicator_color)
+	
+					# Update indicators
+					led_handler.set_color_array(1, color_array_1, invert=True)
+					led_handler.set_color_array(3, color_array_3, invert=True)
 				
 					pulseFlag=0
 										
 				else:
-					pulseFlag=1;
-					singlePulse=0
-					pulseTime=3.5
+					color_array_1 = np.zeros((pin_config[1]['num_pixels'],3))
+					color_array_3 = np.zeros((pin_config[1]['num_pixels'],3))
+					led_handler.set_color_array(1, color_array_1, invert=True)
+					led_handler.set_color_array(3, color_array_3, invert=True)
+					pulseFlag=0
 					print('scores were null')
-				
-
-				print(color_vec[0])
-				print(color_vec[2])
-				'''if team1_posession:
-					print('team1 has posession')
-					pulseFlag=1
-					singlePulse=1
-					pulseTime=1.0
-					rgb=[0, 0, 0]
-					for idx in range(len(rgb)):
-						rgb[idx]= int(color_vec[0][idx] + color_vec[0][idx]*0.5)
-										
-					team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(rgb)]
-					team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(color_vec[2])]
-				
-				
-				elif team2_posession:
-					print('team2 has posession')
-					pulseFlag=1
-					singlePulse=1
-					pulseTime=1.0
-					rgb=[0, 0, 0]
-					for idx in range(len(rgb)):
-						rgb[idx]= int(color_vec[2][idx] + color_vec[2][idx]*0.5)
-										
-					team1_pulse=[rgb2hex(color_vec[0]),rgb2hex(color_vec[0])]
-					team2_pulse=[rgb2hex(color_vec[2]),rgb2hex(rgb)]
-				'''
+			
+			team1_score_last = team1_score
+			team2_score_last = team2_score
 								
 			if pulseFlag:
 				#Set color for 4 sec, 4 times
 				
 				if not singlePulse:
-					numPulses=int(math.ceil(15/(pulseTime*2)))
+					numPulses=int(math.ceil(call_rate/(pulseTime*2)))
 					deadTime=0.0
 				else:
 					numPulses=1
-					deadTime=15-pulseTime*2
+					deadTime=call_rate-pulseTime*2
 					
 				
 				for idx in range(numPulses):
+					print("Pulse Number {}".format(idx))
 					color_vec[0]=hex2rgb(team1_pulse[0])
 					color_vec[1]=hex2rgb(team1_pulse[1])
 					color_vec[2]=hex2rgb(team2_pulse[0])
 					color_vec[3]=hex2rgb(team2_pulse[1])
 					updateFlag.set()
 					time.sleep(pulseTime+0.25)
+					while updateFlag.isSet():
+						time.sleep(0.25)
 					
 					
 					color_vec[0]=hex2rgb(team1_pulse[1])
@@ -267,24 +306,26 @@ if __name__ == '__main__':
 					color_vec[3]=hex2rgb(team2_pulse[0])
 					updateFlag.set()
 					time.sleep(pulseTime+0.25)
+					while updateFlag.isSet():
+						time.sleep(0.25)
 					
 				time.sleep(deadTime)
 					
 					
-			else:				
-				color_temp=color_vec[:]
+			else:		
+				print("Setting primary groups off")		
+				# color_temp=color_vec[:]
 				
+				# color_vec[1]=hex2rgb("7C7C7C")
+				# color_vec[3]=hex2rgb("7C7C7C")
 				
-				color_vec[1]=hex2rgb("7C7C7C")
-				color_vec[3]=hex2rgb("7C7C7C")
+				# updateFlag.set()
+				# time.sleep(fadeTime_default+0.2)
 				
-				updateFlag.set()
-				time.sleep(fadeTime_default+0.2)
-				
-				color_vec[1]=color_temp[1]
-				color_vec[3]=color_temp[3]
-				updateFlag.set()
-				#print nfl_scores.pretty_json(game_data)
+				# color_vec[1]=color_temp[1]
+				# color_vec[3]=color_temp[3]
+				# updateFlag.set()
+				# #print nfl_scores.pretty_json(game_data)
 				time.sleep(call_rate-1)
 			
 			
