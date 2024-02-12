@@ -233,16 +233,17 @@ if __name__ == '__main__':
 
 					# Display the idicator
 					if team1_score == 0 and team2_score == 0:
-						ratio = 0.5
+						idx_1 = indicator_offset
+						idx_3 = indicator_offset
 					elif team1_score == 0:
-						ratio = 0.2
+						idx_1 = indicator_offset
+						idx_3 = int(num_pixels_indicator*team1_score/(team1_score+team2_score)) + indicator_offset
 					elif team2_score == 0:
-						ratio = 0.8
+						idx_1 = int(num_pixels_indicator*team1_score/(team1_score+team2_score)) + indicator_offset
+						idx_3 = indicator_offset
 					else:
-						ratio = team2_score/team1_score
-
-					idx_1 = int(num_pixels_indicator*ratio) + indicator_offset
-					idx_3 = int(num_pixels_indicator*(1-ratio)) + indicator_offset
+						idx_1 = int(num_pixels_indicator*team1_score/(team1_score+team2_score)) + indicator_offset
+						idx_3 = int(num_pixels_indicator*team2_score/(team1_score+team2_score)) + indicator_offset
 
 					# Score Indicator
 					color_array_1 = np.zeros((pin_config[1]['num_pixels'],3))
