@@ -1,13 +1,8 @@
-import RPi.GPIO as GPIO
 import time
 import board
 import neopixel
+import numpy as np
 
-
-
-
-def init():
-	GPIO.setmode(GPIO.BCM)
 
 class PixelHandler:
 
@@ -133,6 +128,113 @@ class PixelHandler:
 			self.set_all_colors(color_vec, show=True)
 			time.sleep(timestep)
 
+class Indicator:
+	"""
+	LED Indicator, a class to set up and control an indicator made
+	of neopixels
+
+	Args:
+		num_pixels (int): The number of pixels in the color group.
+		start_idx (int): The starting pixel index for the indicator.
+		end_idx (int): The ending pixel index for the indicator.
+		verbose (bool): Whether to print in verbose mode.
+	"""
+	def __init__(
+			self,
+			num_pixels,
+			start_idx=None,
+			end_idx=None,
+			verbose=False,
+		):
+		self.num_pixels = num_pixels
+
+		if start_idx is None:
+			self.start_idx = 0
+		else:
+			self.start_idx = start_idx
+		if end_idx is None:
+			self.end_idx = num_pixels
+		else:
+			self.end_idx = end_idx
+		
+		self.verbose = verbose
+
+		self.num_indicator_pixels = self.end_idx - self.start_idx
+
+		# Initialize values
+		self.pixel_vector = np.zeros((num_pixels,3))
+		self._brightness = 1.0
+		self.buffer_color = [[0,0,0],[0,0,0]]
+
+		if self.verbose:
+			print("Total of {} pixels:".format(self.num_pixels))
+			print(self.num_indicator_pixels, self.start_idx, self.end_idx)
+
+	@property
+	def brightness(self):
+		return self._brightness*100.0
+
+	@brightness.setter
+	def brightness(self, brightness):
+		if (brightness < 0) or (brightness > 100):
+			raise ValueError("Brightness must be between 0 and 100")
+		
+		self._brightness = brightness/100.0
+
+	@property
+	def buffer_color(self):
+		return self._buffer_colors
+
+	@buffer_color.setter
+	def buffer_color(self, buffer_color):
+		if isinstance(buffer_color, list):
+			if len(buffer_color) >0:
+				if isinstance(buffer_color[0], list):
+					self._buffer_colors = buffer_color
+				else:
+					self._buffer_colors = [buffer_color, buffer_color]
+			else:
+				raise ValueError('Buffer color must be a 3-vector or a list of 3-vectors')
+		else:
+			raise ValueError('Buffer color must be a 3-vector or a list of 3-vectors')
+			
+		self.pixel_vector[0:self.start_idx,:] = self._buffer_colors[0]
+		self.pixel_vector[self.end_idx+1:,:] = self._buffer_colors[1]
+
+	def compute_fractional_colors(self, color1, color2, ratio):  
+		"""
+		Compute a color array indicator with fractional colors for the endpoint
+		
+		Args:
+			color1 (list(int)): The first color
+			color2 (list(int)): The second color
+			ratio (float): The ratio of pixels to illuminate with color1/color2
+			
+		Returns:
+			color_array (np.ndarray): The output color array 
+		"""
+		num_pixels_full = np.floor(ratio*self.num_indicator_pixels).astype(int)
+		pixel_partial = (ratio*self.num_indicator_pixels) - num_pixels_full
+		
+		# Generate the color array
+		self.pixel_vector[self.start_idx: (self.start_idx+num_pixels_full),:] = color1
+		self.pixel_vector[(self.start_idx+num_pixels_full+1):self.end_idx,:] = color2
+		
+		# Add the partial pixel
+		partial_color = np.array(color1)*pixel_partial + np.array(color2)*(1-pixel_partial)
+		self.pixel_vector[self.start_idx+num_pixels_full,:] = partial_color
+
+		# Adjust the brightness
+		color_array = self.pixel_vector*self._brightness
+		
+		if self.verbose:
+			print("Ratio Input: {}".format(ratio))
+			print("Color Vector:")
+			for color in color_array:
+				print(color)
+			print("")
+		return  color_array
+
 	
 #Create a long array with ramps of color values
 def get_ramp(
@@ -163,36 +265,3 @@ def get_ramp(
 		fadeList[num_steps][pinIdx]=int(new_color_all[pinIdx])
 				
 	return fadeList
-	
-
-	
-	
-
-def clearColors(pins):
-	GPIO.setmode(GPIO.BCM)
-	for i, pin in enumerate(pins):
-		GPIO.setup(pin, GPIO.OUT)
-		GPIO.output(pin, GPIO.LOW)
-		
-def setColors(pins):
-	GPIO.setmode(GPIO.BCM)
-	for i, pin in enumerate(pins):
-		GPIO.setup(pin, GPIO.OUT)
-		GPIO.output(pin, GPIO.HIGH)
-
-
-
-#For Testing Purposes
-	
-# PWM
-def runPulse(pwm):
-	for dc in range(0, 101, 5):
-		for p in pwm:
-			print(p)
-			p.ChangeDutyCycle(dc)
-		time.sleep(0.03)
-	for dc in range(100, -1, -5):
-		for p in pwm:
-			p.ChangeDutyCycle(dc)
-		time.sleep(0.03)
-	return pwm
