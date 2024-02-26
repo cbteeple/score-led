@@ -60,6 +60,15 @@ if __name__ == "__main__":
         {'pin': 21, 'num_pixels': 15, 'start_idx': 9},
     ]
 
+    time_groups = {
+        'hour': {'group': 3, 'start': 2, 'end': -2},
+        'min': {'group': 1, 'start': 2, 'end': -2},
+        'sec': [
+            {'group': 2, 'start': 0, 'end': 0},
+            {'group': 0, 'start': 0, 'end': 0},
+            ],
+    }
+
     led_handler = led.PixelHandler(pin_config)
 
     duration = 20.0 # [sec]
@@ -83,30 +92,31 @@ if __name__ == "__main__":
     main_brightness = 100
 
     indicator_hr = led.Indicator(
-        pin_config[0]['num_pixels'],
+        pin_config[time_groups['hour']['group']]['num_pixels'],
+        time_groups['hour']['start'],
+        pin_config[time_groups['hour']['group']]['num_pixels']+time_groups['hour']['end'],
     )
 
     indicator_min = led.Indicator(
-        pin_config[1]['num_pixels'],
-        2,
-        pin_config[1]['num_pixels']-2,
+        pin_config[time_groups['min']['group']]['num_pixels'],
+        time_groups['min']['start'],
+        pin_config[time_groups['min']['group']]['num_pixels']+time_groups['min']['end'],
     )
 
-    indicator_sec = led.Indicator(
-        pin_config[3]['num_pixels'],
-        2,
-        pin_config[3]['num_pixels']-2,
+    indicator_sec0 = led.Indicator(
+        pin_config[time_groups['sec'][0]['group']]['num_pixels'],
+        time_groups['sec'][0]['start'],
+        pin_config[time_groups['sec'][0]['group']]['num_pixels']+time_groups['sec'][0]['end'],
     )
 
-    indicator_full = led.Indicator(
-        pin_config[2]['num_pixels'],
+    indicator_sec1 = led.Indicator(
+        pin_config[time_groups['sec'][1]['group']]['num_pixels'],
+        time_groups['sec'][1]['start'],
+        pin_config[time_groups['sec'][1]['group']]['num_pixels']+time_groups['sec'][1]['end'],
     )
 
-    indicator_hr.buffer_color = main_color
+    indicator_hr.buffer_color = [0,0,0]
     indicator_min.buffer_color = [0,0,0]
-    indicator_sec.buffer_color = [0,0,0]
-
-    indicator_full.buffer_color = main_color
 
     while True:
         try:
@@ -119,10 +129,10 @@ if __name__ == "__main__":
             
                 main_brightness = get_auto_brightness(now, 80, 5)
                             
-                indicator_hr.brightness = main_brightness +5
+                indicator_hr.brightness = main_brightness 
                 indicator_min.brightness = main_brightness
-                indicator_sec.brightness = main_brightness
-                indicator_full.brightness = main_brightness+5
+                indicator_sec0.brightness = main_brightness+5
+                indicator_sec1.brightness = main_brightness+5
 
                 last_color_check = copy.deepcopy(now)
             
@@ -138,25 +148,39 @@ if __name__ == "__main__":
                 (now.minute+1)/60.0,
             )
             
-            color_array_sec = indicator_sec.compute_fractional_colors(
+            minute_fraction = (((now.second)*1e6)+now.microsecond)/60e6
+
+            if minute_fraction<0.5:
+                minute_fraction1 = minute_fraction*2.0
+                minute_fraction2 = 0
+            else:
+                minute_fraction1 = 1.0
+                minute_fraction2 =  (minute_fraction-0.5)*2.0
+
+            color_array_sec1 = indicator_sec0.compute_fractional_colors(
                 main_color,
                 [0,0,0],
-                (((now.second)*1e6)+now.microsecond)/60e6,
+                minute_fraction1,
             )
 
-            color_array_static = indicator_full.compute_fractional_colors(
+            color_array_sec2 = indicator_sec1.compute_fractional_colors(
                 main_color,
-                main_color,
-                0,
+                [0,0,0],
+                minute_fraction2,
             )
-            
-            led_handler.set_color_array(0, color_array_hr, invert=False)
-            led_handler.set_color_array(1, color_array_min, invert=True)
-            led_handler.set_color_array(3, color_array_sec, invert=True)
 
-            led_handler.set_color_array(2, color_array_static, invert=False)
+            print(color_array_sec2[0])
+
             
-            time.sleep(0.1)
+            #led_handler.load_color_array(time_groups['hour']['group'], color_array_hr, invert=True)
+            #led_handler.load_color_array(time_groups['min']['group'], color_array_min, invert=True)
+            led_handler.load_color_array(time_groups['sec'][0]['group'], color_array_sec1, invert=False)
+            led_handler.load_color_array(time_groups['sec'][1]['group'], color_array_sec2, invert=False)
+            led_handler.send_color_arrays(show=False)
+            led_handler.send_color_arrays(show=True)
+            time.sleep(0.25)
+            
+            #time.sleep(2.0)
     
         except KeyboardInterrupt:
             print("\nStopping...")

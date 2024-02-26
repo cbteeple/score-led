@@ -32,6 +32,7 @@ class PixelHandler:
 				pixel_groups[config['pin']]=num_pixels
 
 		self.pixel_groups = {}
+		self.pixel_vectors = {}
 		for pin, num_pixels in pixel_groups.items():
 			pixels = neopixel.NeoPixel(
 				self.PIN_MAP[pin],
@@ -41,6 +42,9 @@ class PixelHandler:
 				pixel_order=self.ORDER_MAP[order],
 			)
 			self.pixel_groups[pin] = pixels
+			self.pixel_vectors[pin] = np.empty((num_pixels,3))
+			self.pixel_vectors[pin][:] = np.nan
+		
 
 	def stop(self):
 		pass
@@ -53,6 +57,38 @@ class PixelHandler:
 	def show_all(self):
 		for key, pixels in self.pixel_groups.items():
 			pixels.show()
+
+	def load_color_array(self, group_idx, colors, invert=False):
+		group_config = self.pin_configs[group_idx]
+		num_pixels = group_config['num_pixels']
+		offset = group_config['start_idx']
+
+		vec = self.pixel_vectors[group_config['pin']]
+
+		if len(colors)!=num_pixels:
+			raise ValueError("The number of colors in the input array must equla the number of pixels in the group")
+
+		indices = list(range(num_pixels))
+
+		if invert:
+			indices = reversed(indices)
+
+		for idx, i in enumerate(indices):
+			vec[idx+offset] = colors[i]
+
+		self.pixel_vectors[group_config['pin']] = vec
+		
+
+	def send_color_arrays(self, show=True):
+		for key, pixels in self.pixel_groups.items():
+			array = self.pixel_vectors[key]
+			for idx, color in enumerate(array):
+				if not np.isnan(color[0]): 
+					pixels[idx] = color
+
+			if show:
+				pixels.show()
+
 
 	def set_color_array(self, group_idx, colors, invert=False, show=True):
 		group_config = self.pin_configs[group_idx]
@@ -213,16 +249,22 @@ class Indicator:
 		Returns:
 			color_array (np.ndarray): The output color array 
 		"""
-		num_pixels_full = np.floor(ratio*self.num_indicator_pixels).astype(int)
-		pixel_partial = (ratio*self.num_indicator_pixels) - num_pixels_full
+		if ratio == 0:
+			self.pixel_vector[:,:] = color2
 		
-		# Generate the color array
-		self.pixel_vector[self.start_idx: (self.start_idx+num_pixels_full),:] = color1
-		self.pixel_vector[(self.start_idx+num_pixels_full+1):self.end_idx,:] = color2
-		
-		# Add the partial pixel
-		partial_color = np.array(color1)*pixel_partial + np.array(color2)*(1-pixel_partial)
-		self.pixel_vector[self.start_idx+num_pixels_full,:] = partial_color
+		elif ratio ==1:
+			self.pixel_vector[:,:] = color1
+		else:
+			num_pixels_full = np.floor(ratio*self.num_indicator_pixels).astype(int)
+			pixel_partial = (ratio*self.num_indicator_pixels) - num_pixels_full
+			
+			# Generate the color array
+			self.pixel_vector[self.start_idx: (self.start_idx+num_pixels_full),:] = color1
+			self.pixel_vector[(self.start_idx+num_pixels_full+1):self.end_idx,:] = color2
+			
+			# Add the partial pixel
+			partial_color = np.array(color1)*pixel_partial + np.array(color2)*(1-pixel_partial)
+			self.pixel_vector[self.start_idx+num_pixels_full,:] = partial_color
 
 		# Adjust the brightness
 		color_array = self.pixel_vector*self._brightness
