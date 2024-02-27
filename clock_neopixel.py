@@ -126,6 +126,11 @@ if __name__ == "__main__":
             if (now - last_color_check).total_seconds() >= color_check_time:
                 weekday = int(now.weekday())
                 main_color = week_colors[weekday]
+
+                indicator_hr.buffer_color = main_color
+                indicator_min.buffer_color = main_color
+                indicator_sec0.buffer_color = main_color
+                indicator_sec1.buffer_color = main_color
             
                 main_brightness = get_auto_brightness(now, 80, 5)
                             
@@ -168,16 +173,11 @@ if __name__ == "__main__":
                 [0,0,0],
                 minute_fraction2,
             )
-
-            print(color_array_sec2[0])
-
             
-            #led_handler.load_color_array(time_groups['hour']['group'], color_array_hr, invert=True)
-            #led_handler.load_color_array(time_groups['min']['group'], color_array_min, invert=True)
-            led_handler.load_color_array(time_groups['sec'][0]['group'], color_array_sec1, invert=False)
-            led_handler.load_color_array(time_groups['sec'][1]['group'], color_array_sec2, invert=False)
-            led_handler.send_color_arrays(show=False)
-            led_handler.send_color_arrays(show=True)
+            led_handler.set_color_array(time_groups['hour']['group'], color_array_hr, invert=True)
+            led_handler.set_color_array(time_groups['min']['group'], color_array_min, invert=True)
+            led_handler.set_color_array(time_groups['sec'][0]['group'], color_array_sec1, invert=False)
+            led_handler.set_color_array(time_groups['sec'][1]['group'], color_array_sec2, invert=False)
             time.sleep(0.25)
             
             #time.sleep(2.0)
